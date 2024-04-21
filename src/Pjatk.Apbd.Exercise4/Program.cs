@@ -117,4 +117,33 @@ app.MapGet(
     .WithTags("Visits")
     .WithOpenApi();
 
+app.MapGet(
+        "/visits",
+        async (Guid animalId, IVisitRepository repository) =>
+        {
+            var result = await repository.GetAllForAnimal(animalId);
+            return Results.Ok(result);
+        }
+    )
+    .Produces<IEnumerable<VisitWithId>>()
+    .WithTags("Visits")
+    .WithOpenApi();
+
+app.MapPost(
+        "/visits",
+        async (Visit visit, IVisitRepository repository, IAnimalRepository animalRepository) =>
+        {
+            var animal = await animalRepository.Get(visit.AnimalId);
+            if(animal is null) {
+                return Results.BadRequest($"Animal with id {visit.AnimalId} doesn't exist");
+            }
+            var result = await repository.Add(visit);
+            return Results.CreatedAtRoute("GetVisit", new { Id = result.Id }, result);
+        }
+    )
+    .Produces<VisitWithId>(StatusCodes.Status201Created)
+    .Produces(StatusCodes.Status400BadRequest)
+    .WithTags("Visits")
+    .WithOpenApi();
+
 app.Run();
