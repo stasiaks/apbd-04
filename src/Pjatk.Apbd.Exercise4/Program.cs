@@ -3,6 +3,7 @@ using Pjatk.Apbd.Exercise4;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IAnimalRepository, InMemoryAnimalRepository>();
+builder.Services.AddSingleton<IVisitRepository, InMemoryVisitRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -15,9 +16,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+#region Health
+
 app.MapGet("/health", () => Results.NoContent())
     .Produces(StatusCodes.Status204NoContent)
+    .WithTags("Health")
     .WithOpenApi();
+
+#endregion
+
+#region Animal
 
 app.MapGet(
         "/animals",
@@ -28,6 +36,7 @@ app.MapGet(
         }
     )
     .Produces<IEnumerable<AnimalWithId>>()
+    .WithTags("Animals")
     .WithOpenApi();
 
 app.MapGet(
@@ -45,6 +54,7 @@ app.MapGet(
     .WithName("GetAnimal")
     .Produces<AnimalWithId>()
     .Produces(StatusCodes.Status404NotFound)
+    .WithTags("Animals")
     .WithOpenApi();
 
 app.MapDelete(
@@ -56,6 +66,7 @@ app.MapDelete(
         }
     )
     .Produces(StatusCodes.Status204NoContent)
+    .WithTags("Animals")
     .WithOpenApi();
 
 app.MapPost(
@@ -67,6 +78,7 @@ app.MapPost(
         }
     )
     .Produces<AnimalWithId>(StatusCodes.Status201Created)
+    .WithTags("Animals")
     .WithOpenApi();
 
 app.MapPut(
@@ -82,6 +94,27 @@ app.MapPut(
     )
     .Produces<AnimalWithId>(StatusCodes.Status200OK)
     .Produces<AnimalWithId>(StatusCodes.Status201Created)
+    .WithTags("Animals")
+    .WithOpenApi();
+
+#endregion
+
+app.MapGet(
+        "/visits/{Id}",
+        async (Guid Id, IVisitRepository repository) =>
+        {
+            var result = await repository.Get(Id);
+            if (result is not null)
+            {
+                return Results.Ok(result);
+            }
+            return Results.NotFound();
+        }
+    )
+    .WithName("GetVisit")
+    .Produces<VisitWithId>()
+    .Produces(StatusCodes.Status404NotFound)
+    .WithTags("Visits")
     .WithOpenApi();
 
 app.Run();
