@@ -42,6 +42,7 @@ app.MapGet(
             return Results.NotFound();
         }
     )
+    .WithName("GetAnimal")
     .Produces<AnimalWithId>()
     .Produces(StatusCodes.Status404NotFound)
     .WithOpenApi();
@@ -62,10 +63,10 @@ app.MapPost(
         async (Animal animal, IAnimalRepository repository) =>
         {
             var result = await repository.Add(animal);
-            return Results.Ok(result);
+            return Results.CreatedAtRoute("GetAnimal", new { Id = result.Id }, result);
         }
     )
-    .Produces<AnimalWithId>()
+    .Produces<AnimalWithId>(StatusCodes.Status201Created)
     .WithOpenApi();
 
 app.MapPut(
@@ -74,10 +75,13 @@ app.MapPut(
         {
             var animalWithId = new AnimalWithId(Id, animal);
             var result = await repository.AddOrUpdate(animalWithId);
-            return Results.Ok(result);
+            return result.Created
+                ? Results.CreatedAtRoute("GetAnimal", new { Id = result.Animal.Id }, result.Animal)
+                : Results.Ok(result.Animal);
         }
     )
-    .Produces<AnimalWithId>()
+    .Produces<AnimalWithId>(StatusCodes.Status200OK)
+    .Produces<AnimalWithId>(StatusCodes.Status201Created)
     .WithOpenApi();
 
 app.Run();

@@ -7,7 +7,7 @@ namespace Pjatk.Apbd.Exercise4
         Task<IEnumerable<AnimalWithId>> GetAll();
         Task<AnimalWithId?> Get(Guid id);
         Task<AnimalWithId> Add(Animal animal);
-        Task<AnimalWithId> AddOrUpdate(AnimalWithId animal);
+        Task<(AnimalWithId Animal, bool Created)> AddOrUpdate(AnimalWithId animal);
         Task Delete(Guid id);
     }
 
@@ -23,10 +23,11 @@ namespace Pjatk.Apbd.Exercise4
             return Task.FromResult(new AnimalWithId(newId, animal));
         }
 
-        public Task<AnimalWithId> AddOrUpdate(AnimalWithId animal)
+        public Task<(AnimalWithId Animal, bool Created)> AddOrUpdate(AnimalWithId animal)
         {
+            var created = !dictionary.ContainsKey(animal.Id);
             dictionary.AddOrUpdate(animal.Id, _ => animal, (_, _) => animal);
-            return Task.FromResult(animal);
+            return Task.FromResult((animal, created));
         }
 
         public Task Delete(Guid id)
