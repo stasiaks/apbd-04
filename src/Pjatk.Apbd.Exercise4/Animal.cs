@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Pjatk.Apbd.Exercise4
 {
     public record Animal(
@@ -19,6 +21,7 @@ namespace Pjatk.Apbd.Exercise4
             : this(Id, animal.Name, animal.Category, animal.MassInKilogram, animal.CoatColor) { }
     };
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum AnimalCategory
     {
         Other,

@@ -8,7 +8,7 @@ namespace Pjatk.Apbd.Exercise4
         Task<AnimalWithId?> Get(Guid id);
         Task<AnimalWithId> Add(Animal animal);
         Task<AnimalWithId> AddOrUpdate(AnimalWithId animal);
-        Task Delete();
+        Task Delete(Guid id);
     }
 
     internal class InMemoryAnimalRepository : IAnimalRepository
@@ -17,17 +17,22 @@ namespace Pjatk.Apbd.Exercise4
 
         public Task<AnimalWithId> Add(Animal animal)
         {
-            throw new NotImplementedException();
+            var newId = Guid.NewGuid();
+            dictionary.GetOrAdd(newId, animal); // Nie obsługuję kolizji GUIDów
+
+            return Task.FromResult(new AnimalWithId(newId, animal));
         }
 
         public Task<AnimalWithId> AddOrUpdate(AnimalWithId animal)
         {
-            throw new NotImplementedException();
+            dictionary.AddOrUpdate(animal.Id, _ => animal, (_, _) => animal);
+            return Task.FromResult(animal);
         }
 
-        public Task Delete()
+        public Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            dictionary.TryRemove(id, out var _);
+            return Task.CompletedTask;
         }
 
         public Task<AnimalWithId?> Get(Guid id)
