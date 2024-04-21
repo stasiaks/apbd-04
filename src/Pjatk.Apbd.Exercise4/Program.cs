@@ -134,7 +134,8 @@ app.MapPost(
         async (Visit visit, IVisitRepository repository, IAnimalRepository animalRepository) =>
         {
             var animal = await animalRepository.Get(visit.AnimalId);
-            if(animal is null) {
+            if (animal is null)
+            {
                 return Results.BadRequest($"Animal with id {visit.AnimalId} doesn't exist");
             }
             var result = await repository.Add(visit);
