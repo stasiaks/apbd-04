@@ -1,20 +1,38 @@
-using Pjatk.Apbd.Exercise2.Core;
-
-public record Animal(Guid Id, string Name, AnimalCategory Category, Kilogram Kilogram);
-
-public enum AnimalCategory
+namespace Pjatk.Apbd.Exercise4
 {
-    Other,
-    Cat,
-    Dog,
-    Fish,
+    public record Animal(
+        string Name,
+        AnimalCategory Category,
+        decimal MassInKilogram,
+        string CoatColor
+    );
 
-    /// <summary>
-    /// This is the catch all category for a host of fuzzy mammals, including ferrets, rabbits, guinea pigs, gerbils and many other cuddly creatures.
-    /// </summary>
-    SmallMammal,
-    Bird,
-    Reptile,
-    Amphibian,
-    Equine
+    public record AnimalWithId(
+        Guid Id,
+        string Name,
+        AnimalCategory Category,
+        decimal MassInKilogram,
+        string CoatColor
+    ) : Animal(Name, Category, MassInKilogram, CoatColor)
+    {
+        public AnimalWithId(Guid Id, Animal animal)
+            : this(Id, animal.Name, animal.Category, animal.MassInKilogram, animal.CoatColor) { }
+    };
+
+    public enum AnimalCategory
+    {
+        Other,
+        Cat,
+        Dog,
+        Fish,
+
+        /// <summary>
+        /// This is the catch all category for a host of fuzzy mammals, including ferrets, rabbits, guinea pigs, gerbils and many other cuddly creatures.
+        /// </summary>
+        SmallMammal,
+        Bird,
+        Reptile,
+        Amphibian,
+        Equine
+    }
 }
